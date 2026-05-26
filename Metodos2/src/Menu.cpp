@@ -1,116 +1,122 @@
-#include "Menu.hpp"
+#include "Menu.h"
+#include "BusquedaArreglo.h"
+#include "BusquedaCentinela.h"
+#include "ListaEnlazada.h"
 #include <iostream>
+#include <vector>
+#include <string>
 #include <limits>
 #include <iomanip>
-
 using namespace std;
 
-void Menu::run() {
-    int opcion;
-    do {
-        cout << "\n===== BUSQUEDA SECUENCIAL =====\n"
-             << "1. Busqueda basica (arreglo)\n"
-             << "2. Busqueda con centinela (arreglo)\n"
-             << "3. Busqueda recursiva (lista enlazada)\n"
-             << "4. Comparar los tres metodos\n"
-             << "0. Salir\n"
-             << "Opcion: ";
-        opcion = solicitarEntero("");
-        switch (opcion) {
-        case 1: opcionBusquedaBasica();     break;
-        case 2: opcionBusquedaCentinela();  break;
-        case 3: opcionBusquedaRecursiva();  break;
-        case 4: opcionComparar();           break;
-        case 0: cout << "Hasta luego.\n";   break;
-        default: cout << "Opcion invalida.\n";
-        }
-    } while (opcion != 0);
-}
-
-void Menu::opcionBusquedaBasica() {
-    vector<int> vec = solicitarVector();
-    int objetivo = solicitarEntero("Elemento a buscar: ");
-    int pos = basica.buscar(vec, objetivo);
-    if (pos == -1)
-        cout << "No encontrado. Comparaciones: " << basica.getComparaciones() << '\n';
-    else
-        cout << "Encontrado en posicion " << pos << ". Comparaciones: " << basica.getComparaciones() << '\n';
-}
-
-void Menu::opcionBusquedaCentinela() {
-    vector<int> vec = solicitarVector();
-    int objetivo = solicitarEntero("Elemento a buscar: ");
-    int pos = centinela.buscar(vec, objetivo);
-    if (pos == -1)
-        cout << "No encontrado. Comparaciones: " << centinela.getComparaciones() << '\n';
-    else
-        cout << "Encontrado en posicion " << pos << ". Comparaciones: " << centinela.getComparaciones() << '\n';
-}
-
-void Menu::opcionBusquedaRecursiva() {
-    int n = solicitarEntero("Cantidad de nodos a insertar: ");
-    ListaEnlazada lst;
-    for (int i = 0; i < n; ++i) {
-        int dato = solicitarEntero("  Nodo " + to_string(i + 1) + ": ");
-        lst.insertar(dato);
-    }
-    cout << "Lista: ";
-    lst.mostrar();
-    int objetivo = solicitarEntero("Elemento a buscar: ");
-    int pos = lst.buscarRecursivo(objetivo);
-    if (pos == -1)
-        cout << "No encontrado. Comparaciones: " << lst.getComparaciones() << '\n';
-    else
-        cout << "Encontrado en posicion " << pos << ". Comparaciones: " << lst.getComparaciones() << '\n';
-}
-
-void Menu::opcionComparar() {
-    vector<int> vec = solicitarVector();
-    int objetivo = solicitarEntero("Elemento a buscar: ");
-
-    // Copiar para centinela porque lo modifica temporalmente
-    vector<int> vecCentinela = vec;
-
-    // Copiar en lista enlazada
-    ListaEnlazada lst;
-    for (int x : vec) lst.insertar(x);
-
-    int posB = basica.buscar(vec, objetivo);
-    int posC = centinela.buscar(vecCentinela, objetivo);
-    int posR = lst.buscarRecursivo(objetivo);
-
-    cout << "\n--- Comparacion de metodos ---\n"
-         << left << setw(20) << "Metodo"
-         << setw(12) << "Posicion"
-         << "Comparaciones\n"
-         << string(44, '-') << '\n'
-         << setw(20) << "Basica"
-         << setw(12) << (posB == -1 ? "N/A" : to_string(posB))
-         << basica.getComparaciones() << '\n'
-         << setw(20) << "Centinela"
-         << setw(12) << (posC == -1 ? "N/A" : to_string(posC))
-         << centinela.getComparaciones() << '\n'
-         << setw(20) << "Recursiva (lista)"
-         << setw(12) << (posR == -1 ? "N/A" : to_string(posR))
-         << lst.getComparaciones() << '\n';
-}
-
-int Menu::solicitarEntero(const string& prompt) {
+static int pedirEntero(const string& mensaje) {
     int valor;
     while (true) {
-        if (!prompt.empty()) cout << prompt;
-        if (cin >> valor) return valor;
-        cout << "Entrada invalida. Ingrese un numero entero: ";
+        cout << mensaje;
+        if (cin >> valor)
+            return valor;
+        cout << "Ingresa un numero entero valido.\n";
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 }
 
-vector<int> Menu::solicitarVector() {
-    int n = solicitarEntero("Cantidad de elementos: ");
+static vector<int> pedirVector() {
+    int n = pedirEntero("Cuantos elementos? ");
     vector<int> vec;
-    vec.reserve(n);
-    for (int i = 0; i < n; ++i)
-        vec.push_back(solicitarEntero("  Elemento " + to_string(i + 1) + ": "));
+    for (int i = 0; i < n; i++)
+        vec.push_back(pedirEntero("  Elemento " + to_string(i + 1) + ": "));
     return vec;
+}
+
+void mostrarMenu() {
+    cout << "\n===== BUSQUEDA SECUENCIAL =====\n"
+         << "1. Busqueda basica\n"
+         << "2. Busqueda con centinela\n"
+         << "3. Busqueda recursiva en lista enlazada\n"
+         << "4. Comparar los tres metodos\n"
+         << "0. Salir\n"
+         << "Opcion: ";
+}
+
+void opcionBasica() {
+    vector<int> vec = pedirVector();
+    int objetivo = pedirEntero("Elemento a buscar: ");
+    int comparaciones;
+
+    int pos = busquedaBasica(vec, objetivo, comparaciones);
+
+    if (pos == -1)
+        cout << "No encontrado.";
+    else
+        cout << "Encontrado en posicion " << pos << ".";
+    cout << "  Comparaciones: " << comparaciones << "\n";
+}
+
+void opcionCentinela() {
+    vector<int> vec = pedirVector();
+    int objetivo = pedirEntero("Elemento a buscar: ");
+    int comparaciones;
+
+    int pos = busquedaCentinela(vec, objetivo, comparaciones);
+
+    if (pos == -1)
+        cout << "No encontrado.";
+    else
+        cout << "Encontrado en posicion " << pos << ".";
+    cout << "  Comparaciones: " << comparaciones << "\n";
+}
+
+void opcionRecursiva() {
+    int n = pedirEntero("Cuantos nodos? ");
+    Nodo* lista = nullptr;
+    for (int i = 0; i < n; i++) {
+        int dato = pedirEntero("  Nodo " + to_string(i + 1) + ": ");
+        insertarNodo(lista, dato);
+    }
+
+    cout << "Lista: ";
+    mostrarLista(lista);
+
+    int objetivo = pedirEntero("Elemento a buscar: ");
+    int comparaciones = 0;
+    int pos = buscarEnLista(lista, objetivo, comparaciones);
+
+    if (pos == -1)
+        cout << "No encontrado.";
+    else
+        cout << "Encontrado en posicion " << pos << ".";
+    cout << "  Comparaciones: " << comparaciones << "\n";
+
+    liberarLista(lista);
+}
+
+void opcionComparar() {
+    vector<int> vec = pedirVector();
+    int objetivo = pedirEntero("Elemento a buscar: ");
+
+    int cmpB, cmpC, cmpR = 0;
+
+    vector<int> vecC = vec;
+    Nodo* lista = nullptr;
+    for (int x : vec)
+        insertarNodo(lista, x);
+
+    int posB = busquedaBasica(vec, objetivo, cmpB);
+    int posC = busquedaCentinela(vecC, objetivo, cmpC);
+    int posR = buscarEnLista(lista, objetivo, cmpR);
+
+    liberarLista(lista);
+
+    cout << "\n" << left
+         << setw(20) << "Metodo"
+         << setw(12) << "Posicion"
+         << "Comparaciones\n"
+         << string(44, '-') << "\n"
+         << setw(20) << "Basica"
+         << setw(12) << (posB == -1 ? "N/A" : to_string(posB)) << cmpB << "\n"
+         << setw(20) << "Centinela"
+         << setw(12) << (posC == -1 ? "N/A" : to_string(posC)) << cmpC << "\n"
+         << setw(20) << "Recursiva (lista)"
+         << setw(12) << (posR == -1 ? "N/A" : to_string(posR)) << cmpR << "\n";
 }

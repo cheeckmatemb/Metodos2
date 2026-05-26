@@ -1,73 +1,45 @@
-#include "ListaEnlazada.hpp"
+#include "ListaEnlazada.h"
 #include <iostream>
+using namespace std;
 
-ListaEnlazada::ListaEnlazada() : cabeza(nullptr), comparaciones(0) {}
+void insertarNodo(Nodo*& cabeza, int dato) {
+    Nodo* nuevo = new Nodo();
+    nuevo->dato = dato;
+    nuevo->siguiente = nullptr;
 
-ListaEnlazada::~ListaEnlazada() {
-    liberar();
-}
-
-ListaEnlazada::ListaEnlazada(const ListaEnlazada& otra) : cabeza(nullptr), comparaciones(otra.comparaciones) {
-    copiarDesde(otra);
-}
-
-ListaEnlazada& ListaEnlazada::operator=(const ListaEnlazada& otra) {
-    if (this != &otra) {
-        liberar();
-        comparaciones = otra.comparaciones;
-        copiarDesde(otra);
-    }
-    return *this;
-}
-
-void ListaEnlazada::insertar(int dato) {
-    Nodo* nuevo = new Nodo(dato);
-    if (!cabeza) {
+    if (cabeza == nullptr) {
         cabeza = nuevo;
         return;
     }
+
     Nodo* actual = cabeza;
-    while (actual->siguiente)
+    while (actual->siguiente != nullptr)
         actual = actual->siguiente;
     actual->siguiente = nuevo;
 }
 
-int ListaEnlazada::buscarRecursivo(int objetivo) {
-    comparaciones = 0;
-    return buscarRecursivoAux(cabeza, objetivo, 0);
+int buscarEnLista(Nodo* nodo, int objetivo, int& comparaciones, int posicion) {
+    if (nodo == nullptr)
+        return -1;
+    comparaciones++;
+    if (nodo->dato == objetivo)
+        return posicion;
+    return buscarEnLista(nodo->siguiente, objetivo, comparaciones, posicion + 1);
 }
 
-int ListaEnlazada::getComparaciones() const {
-    return comparaciones;
-}
-
-void ListaEnlazada::mostrar() const {
+void mostrarLista(Nodo* cabeza) {
     Nodo* actual = cabeza;
-    while (actual) {
-        std::cout << actual->dato;
-        if (actual->siguiente) std::cout << " -> ";
+    while (actual != nullptr) {
+        cout << actual->dato;
+        if (actual->siguiente != nullptr)
+            cout << " -> ";
         actual = actual->siguiente;
     }
-    std::cout << '\n';
+    cout << endl;
 }
 
-int ListaEnlazada::buscarRecursivoAux(Nodo* nodo, int objetivo, int posicion) {
-    if (!nodo) return -1;
-    ++comparaciones;
-    if (nodo->dato == objetivo) return posicion;
-    return buscarRecursivoAux(nodo->siguiente, objetivo, posicion + 1);
-}
-
-void ListaEnlazada::copiarDesde(const ListaEnlazada& otra) {
-    Nodo* actual = otra.cabeza;
-    while (actual) {
-        insertar(actual->dato);
-        actual = actual->siguiente;
-    }
-}
-
-void ListaEnlazada::liberar() {
-    while (cabeza) {
+void liberarLista(Nodo*& cabeza) {
+    while (cabeza != nullptr) {
         Nodo* temp = cabeza;
         cabeza = cabeza->siguiente;
         delete temp;

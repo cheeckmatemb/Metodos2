@@ -1,25 +1,25 @@
-#include "BusquedaCentinela.hpp"
+#include "BusquedaCentinela.h"
+#include <vector>
+using namespace std;
 
-int BusquedaCentinela::buscar(std::vector<int>& vec, int objetivo) {
+int busquedaCentinela(vector<int>& vec, int objetivo, int& comparaciones) {
     comparaciones = 0;
     if (vec.empty())
         return -1;
 
-    int tamOriginal = static_cast<int>(vec.size());
-    vec.push_back(objetivo); // centinela: garantiza que el bucle termina sin verificar índice
+    int tamano = (int)vec.size();
+    vec.push_back(objetivo); // centinela al final: el bucle siempre va a terminar
 
     int i = 0;
     while (vec[i] != objetivo) {
-        ++comparaciones;
-        ++i;
+        comparaciones++;
+        i++;
     }
-    ++comparaciones; // la comparación que terminó el bucle
+    comparaciones++; // la comparacion que detuvo el bucle
 
-    vec.pop_back(); // restaurar el vector a su estado original
+    vec.pop_back(); // restaurar el vector
 
-    return (i < tamOriginal) ? i : -1;
-}
-
-int BusquedaCentinela::getComparaciones() const {
-    return comparaciones;
+    if (i < tamano)
+        return i;
+    return -1;
 }
