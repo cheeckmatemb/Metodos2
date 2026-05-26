@@ -1,12 +1,20 @@
-﻿# CMakeList.txt: proyecto de CMake para Metodos2, incluya el origen y defina
-# la lógica específica del proyecto aquí.
-#
+cmake_minimum_required(VERSION 3.10)
+project(BusquedaSecuencial LANGUAGES CXX)
 
-# Agregue un origen al ejecutable de este proyecto.
-add_executable (Metodos2 "Metodos2.cpp" "Metodos2.h")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET Metodos2 PROPERTY CXX_STANDARD 20)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+add_executable(BusquedaSecuencial
+    src/main.cpp
+    src/BusquedaArreglo.cpp
+    src/BusquedaCentinela.cpp
+    src/ListaEnlazada.cpp
+    src/Menu.cpp
+)
+
+if(MSVC)
+    target_compile_options(BusquedaSecuencial PRIVATE /utf-8 /W4)
+    target_compile_definitions(BusquedaSecuencial PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
-
-# TODO: Agregue pruebas y destinos de instalación si es necesario.
