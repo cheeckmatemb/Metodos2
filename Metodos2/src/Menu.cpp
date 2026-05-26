@@ -7,7 +7,18 @@
 #include <string>
 #include <limits>
 #include <iomanip>
+#include <cstdlib>
 using namespace std;
+
+void limpiarPantalla() {
+    system("cls");
+}
+
+void pausar() {
+    cout << "\nPresiona Enter para continuar...";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
+}
 
 static int pedirEntero(const string& mensaje) {
     int valor;
@@ -30,7 +41,8 @@ static vector<int> pedirVector() {
 }
 
 void mostrarMenu() {
-    cout << "\n===== BUSQUEDA SECUENCIAL =====\n"
+    limpiarPantalla();
+    cout << "===== BUSQUEDA SECUENCIAL =====\n"
          << "1. Busqueda basica\n"
          << "2. Busqueda con centinela\n"
          << "3. Busqueda recursiva en lista enlazada\n"
@@ -51,6 +63,7 @@ void opcionBasica() {
     else
         cout << "Encontrado en posicion " << pos << ".";
     cout << "  Comparaciones: " << comparaciones << "\n";
+    pausar();
 }
 
 void opcionCentinela() {
@@ -65,6 +78,7 @@ void opcionCentinela() {
     else
         cout << "Encontrado en posicion " << pos << ".";
     cout << "  Comparaciones: " << comparaciones << "\n";
+    pausar();
 }
 
 void opcionRecursiva() {
@@ -89,6 +103,7 @@ void opcionRecursiva() {
     cout << "  Comparaciones: " << comparaciones << "\n";
 
     liberarLista(lista);
+    pausar();
 }
 
 void opcionComparar() {
@@ -119,4 +134,5 @@ void opcionComparar() {
          << setw(12) << (posC == -1 ? "N/A" : to_string(posC)) << cmpC << "\n"
          << setw(20) << "Recursiva (lista)"
          << setw(12) << (posR == -1 ? "N/A" : to_string(posR)) << cmpR << "\n";
+    pausar();
 }
